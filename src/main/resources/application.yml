@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ddi?serverTimeZone=URC&CharacterEncoding=UTF-8
+    username: root
+    password: alswn
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+    #swagger오류 안나게 하기 위한 설정
+    pathmatch: 
+      matching-strategy: ANT_PATH_MATCHER
+mybatis:
+  mapper-locations: mapper/**/*.xml

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monorama.ddi.mapper.MainMapper">
+	<select id="getLoginResult" parameterType="hashmap" resultType="String">
+		SELECT seq FROM action_user WHERE passwd = #{passwd} AND locale = #{locale}
+	</select>
+	<insert id="insertActionSession" parameterType="com.monorama.ddi.model.ActionSession">
+		INSERT INTO action_session (user_seq, session_key, ua, ip) VALUES (#{user_seq}, #{session_key}, #{ua}, #{ip})
+	</insert>
+	<select id="getActionSessionByKey" parameterType="hashmap" resultType="com.monorama.ddi.model.ActionSession">
+		SELECT * FROM action_session WHERE session_key = #{session_key} AND user_seq = #{user_seq}
+	</select>
+	<select id="getUserSeqByLocale" parameterType="String" resultType="int">
+		SELECT seq FROM action_user WHERE locale=#{locale}
+	</select>
+	
+	<select id="getDfiFoodListByKeyword" parameterType="string" resultType="hashmap">
+		SELECT seq AS 'n', name AS 'name'  FROM dfi_dic_food WHERE name LIKE CONCAT(#{keyword},'%')
+	</select>
+	<select id="getDfiFoodListByDrugSeq" parameterType="int" resultType="hashmap">
+		<!--SELECT food_seq AS seq, foods AS name FROM dfi WHERE drug_seq=#{drug_seq}-->
+		SELECT A.seq As 'seq', A.name AS 'name'
+		FROM
+		(SELECT * FROM dfi_dic_food
+		INNER JOIN (SELECT dfi.food_seq FROM dfi WHERE dfi.drug_seq=#{drug_seq}) AS B
+		ON dfi_dic_food.seq=B.food_seq) AS A
+	</select>
+	<select id="getDfiDrugListByKeyword" parameterType="string" resultType="hashmap">
+		SELECT seq AS 'n', name AS 'name' FROM dfi_dic_drug WHERE name LIKE CONCAT(#{keyword},'%')
+	</select>
+	<select id="getDfiDrugListByFoodSeq" parameterType="int" resultType="hashmap">
+		SELECT A.seq AS 'seq', A.name AS 'name'
+		FROM
+		(SELECT * FROM dfi_dic_drug
+		INNER JOIN (SELECT dfi.drug_seq FROM dfi WHERE dfi.food_seq=#{food_seq}) AS B
+		ON dfi_dic_drug.seq=B.drug_seq) AS A
+	</select>
+	<select id="getDfiAndPaperByFoodSeqAndDrugSeq" parameterType="hashmap" resultType="hashmap">
+		SELECT A.seq AS 'seq', A.pmid AS 'pmid', A.drug_seq AS 'drug_seq', A.food_seq AS 'food_seq', A.key_sents AS 'key_sents', A.foods AS 'foods', A.drugs AS 'drugs', A.evidence_level AS 'evidence_level', A.title AS 'title', A.abstractText AS 'abstract'
+		FROM
+		(SELECT B.seq, B.pmid, B.drug_seq, B.food_seq, B.key_sents, B.foods, B.drugs, B.evidence_level, dfi_paper.title, dfi_paper.abstract As abstractText FROM dfi_paper
+		INNER JOIN (SELECT * FROM dfi WHERE dfi.food_seq=#{food_seq} AND dfi.drug_seq=#{drug_seq}) AS B
+		ON dfi_paper.pmid=B.pmid) AS A
+	</select>
+	
+	<select id="getDdiDrugListByKeyword" parameterType="string" resultType="hashmap">
+		SELECT drug_n as 'n' , name AS 'name'
+		FROM ddi_drug WHERE name LIKE CONCAT(#{keyword},'%')
+	</select>
+	<select id="getDrugNumByDrugSeq" parameterType="int" resultType="int">
+		SELECT drug_n FROM ddi_drug WHERE seq=#{drugSeq}
+	</select>
+	<select id="getPkResponseByPdrugNumAndVdrugNum" parameterType="hashmap" resultType="com.monorama.ddi.model.PkResponse">
+		SELECT * FROM ddi_pk WHERE prepetrator=#{pdrugNum} AND victim=#{vdrugNum}
+	</select>
+	<select id="getDrugNameByDrugNum" parameterType="int" resultType="string">
+		SELECT name FROM ddi_drug WHERE drug_n=#{drugNum}
+	</select>
+	<select id="getDdiPolyListByPdrugNumAndVdrugNum" parameterType="hashmap" resultType="com.monorama.ddi.model.DdiPoly" >
+		SELECT * FROM ddi.ddi_poly WHERE drug_n=#{pdrugNum}  or drug_n=#{vdrugNum} ORDER BY protein ASC
+	</select>
+	<select id="getDdiSnp2BydrugNum" parameterType="int" resultType="com.monorama.ddi.model.DdiSnp2">
+		SELECT * FROM ddi_snp2 WHERE code=#{drugNum}
+	</select>
+	<select id="getDrugAtcByDrugNum" parameterType="int" resultType="string">
+		SELECT atc FROM ddi_atc WHERE drug_n=#{drugNum}
+	</select>
+	<select id="getDrugNumByAtc" parameterType="string" resultType="int">
+		SELECT drug_n FROM ddi_atc WHERE atc=#{atc} 
+	</select>
+</mapper>

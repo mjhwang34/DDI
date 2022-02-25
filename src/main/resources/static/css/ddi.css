@@ -1,0 +1,246 @@
+* {
+    box-sizing: border-box;
+}
+
+body>div.h100 {
+    height: 100%;
+}
+
+md-content {
+    height: 100%;
+    background-color: white;
+}
+
+md-card {
+    height: calc(100% - 20px);
+}
+
+md-tabs {
+    height: 100%;
+}
+
+md-tabs.md-dynamic-height md-tabs-content-wrapper {
+    height: calc(100% - 50px);
+}
+
+md-tab-content {
+    height: 100%;
+}
+
+.ddi_info {
+    border: 1px solid gray;
+    margin: 10px;
+    padding: 40px;
+    height: calc(100% - 150px);
+    overflow-y: scroll;
+}
+
+.ddi_info .tit {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.ddi_info .tit:first-of-type {
+    margin-top: 0px;
+}
+
+.ddi_info .txt {
+    display: block;
+    padding-left: 10px;
+}
+
+table {
+    width: 100%;
+    border: 1px;
+    border-collapse: collapse;
+}
+
+table th {
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    padding: 20px 0px;
+    word-break: keep-all;
+}
+
+table td {
+    border-bottom: 1px solid gray;
+    padding: 10px 0px;
+    text-align: center;
+}
+
+table.basic {
+    max-width: 800px;
+}
+
+table.basic th {
+    width: 33%;
+}
+
+
+table th.pmid {
+    max-width: 200px;
+}
+
+table.list {
+    margin-bottom: 40px;
+}
+
+table.list td {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
+    color: rgb(57,73,171) !important;
+    background-color:rgb(57,73,171) !important;
+}
+
+md-tabs .md-tab.md-active {
+    color:white;
+    background-color: rgb(57,73,171);
+}
+
+.md-button.md-default-theme.md-primary.md-fab, .md-button.md-primary.md-fab, .md-button.md-default-theme.md-primary.md-raised, .md-button.md-primary.md-raised {
+    /*background-color: red;*/
+    color: rgb(255,255,255);
+}
+
+.md-button.md-primary:hover {
+    /*background-color: red;!important*/
+    color: rgb(255,255,255);
+}
+
+.ddi_dfi md-input-container {
+    min-width: 200px;
+    max-width: 300px;
+}
+
+span.key_sents_in_txt {
+    background-color: yellow;
+}
+
+span.foods_in_txt {
+    color:red;font-weight: bold;
+}
+
+span.drugs_in_txt {
+    color:blue;font-weight: bold;
+}
+
+button.switch {
+    background: url('/images/switch.png') 50% 50% no-repeat;
+    border:0px;
+    background-color: transparent;
+    background-size: 23px 20px;
+    height: 60px;
+    overflow: hidden;
+    position: relative;
+    width: 64px;
+    z-index: 90;
+    cursor: pointer;
+}
+
+.login_message {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    color: tomato;
+    margin-top: 20px;
+}
+
+table.protein {
+    margin-top: 10px;
+}
+
+table.gene th, table.gene td {
+    padding:15px 20px
+}
+
+
+.loading_m {
+    height:100%;
+}
+
+
+path.link,
+path.textpath {
+    fill: none;
+    stroke: #cccccc;
+    stroke-width: 0.5px;
+}
+
+path.link_dot {
+    stroke-dasharray: 0,2 1;
+}
+
+path.invis {
+    fill: none;
+    stroke-width: 0;
+}
+
+.textClass {
+    font-size: 0.8rem;
+}
+
+.node {
+    cursor:pointer
+}
+
+
+md-input-container.md-input-focused label:not(.md-no-float), md-input-container.md-input-has-placeholder label:not(.md-no-float), md-input-container.md-input-has-value label:not(.md-no-float) {
+    transform: translate3d(0,-5px,0) scale(1);
+    transition: transform .4s cubic-bezier(.25,.8,.25,1),width .4s cubic-bezier(.25,.8,.25,1);
+}
+
+
+
+table.legend {
+    border: 1px;
+    border-collapse: collapse;
+}
+
+table.legend td {
+    font-size: 0.7rem;
+    padding:10px;
+}
+
+
+.btn_text, .btn_sort {
+    line-height: 30px;
+    vertical-align:middle;
+    cursor: pointer;
+}
+
+.btn_filter {
+    display: inline-block;
+    cursor: pointer;
+}
+
+div.list_filter {
+    border:1px solid #333333;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: absolute;
+    top:0px;
+    padding:10px 10px;
+    border:1px solid #343434;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 26%);
+    background-color: white;
+}
+
+div.list_filter > div {
+    text-align: center;
+}
+
+.clist {
+    display: block;
+    height: auto;
+}
