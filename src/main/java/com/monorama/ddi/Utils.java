@@ -1,5 +1,6 @@
 package com.monorama.ddi;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,5 +41,27 @@ public class Utils {
         }
 		
 		return ip;
+	}
+	public static String findReferenceMessage(int reference, PkMessage pkMessage) {
+		if(reference==0) {
+			return pkMessage.getRef_0();
+		}
+		else if(reference==1) {
+			return pkMessage.getRef_1();
+		}
+		return null;
+	}
+	public static String findDetailMessage(float foldValue, PkMessage pkMessage) {
+		String m;
+		if(foldValue>0) {
+			m = pkMessage.getDetail_gt();
+		}
+		else if(foldValue<0) {
+			m = pkMessage.getDetail_lt();
+		}
+		else {
+			m = pkMessage.getDetail_eq();
+		}
+		return m;
 	}
 }

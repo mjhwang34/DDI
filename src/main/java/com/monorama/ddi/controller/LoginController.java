@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.monorama.ddi.CookieManager;
 import com.monorama.ddi.Utils;
 import com.monorama.ddi.exception.AuthException;
 import com.monorama.ddi.exception.LoginFailException;
@@ -116,6 +118,46 @@ public class LoginController {
 			@RequestHeader(value="locale") String locale, 
 			HttpServletRequest req, HttpServletResponse res) {
 		System.out.println("언어:" + locale);
+		
+		HashMap <String, String> cookieHashMap = CookieManager.getAllCookies(req);
+		
+		String sessionKey = null;
+		sessionKey = cookieHashMap.get("sk_"+locale); // 많은 쿠키 중 필요한 쿠키 찾기
+		
+		if(sessionKey == null) { //쿠키가 존재하지 않을 때
+			throw new AuthException();			
+		}
+		
+		System.out.println("세션키:" + sessionKey);
+		
+		int userSeq = loginService.getUserSeqByLocale(locale);
+		
+		HashMap<String, Object> info = new HashMap<String, Object>();
+		info.put("session_key", sessionKey);
+		info.put("user_seq", userSeq);
+		
+		ActionSession actionSession = loginService.getActionSessionByKey(info);
+		if(actionSession == null) { //쿠키값이 있음에도 유효하지 않다
+			Cookie cookie = new Cookie("sk_"+locale, null);
+			res.addCookie(cookie); // 삭제하고 쿠키를 다시 response로 보내줘야함
+			throw new AuthException();
+		}
+		
+		Message message = new Message();
+		return message;
+	}
+	/*
+	@GetMapping("/is_login")
+	@ApiOperation(value="로그인 여부 확인", notes="로그인이 되어 있는지 확인할 수 있는 기능")
+	@ApiResponses(value= {
+		@ApiResponse(code=200, message="로그인 상태",  response=Message.class),
+		@ApiResponse(code=401, message="로그인 상태가 아님")
+	})
+	@ApiImplicitParam(name="locale", value="언어설정: ko 또는 en", example="ko")
+	public Object isLogin(
+			@RequestHeader(value="locale") String locale, 
+			HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("언어:" + locale);
 		String sessionKey=null;
 		for (Cookie cookie : req.getCookies()) { //받은 많은 쿠기 중 필요한 쿠키 찾기 
 	        if(("sk_"+locale).equalsIgnoreCase(cookie.getName())) {
@@ -142,5 +184,5 @@ public class LoginController {
 		
 		Message message = new Message();
 		return message;
-	}
+	}*/
 }
