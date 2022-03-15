@@ -26,7 +26,7 @@ public class DdiService {
 		return mainMapper.getDrugNumByDrugSeq(drugSeq);
 	}
 	
-	public PkResponse getPkResponseByPdrugNumAndVdrugNum(HashMap <String, Integer> info) {
+	public List<PkResponse> getPkResponseByPdrugNumAndVdrugNum(HashMap <String, Integer> info) {
 		return mainMapper.getPkResponseByPdrugNumAndVdrugNum(info);
 	}
 	

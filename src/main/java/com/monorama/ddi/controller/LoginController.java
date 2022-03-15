@@ -7,13 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.monorama.ddi.CookieManager;
 import com.monorama.ddi.Utils;
 import com.monorama.ddi.exception.AuthException;
 import com.monorama.ddi.exception.LoginFailException;
@@ -116,16 +119,17 @@ public class LoginController {
 			@RequestHeader(value="locale") String locale, 
 			HttpServletRequest req, HttpServletResponse res) {
 		System.out.println("언어:" + locale);
-		String sessionKey=null;
-		for (Cookie cookie : req.getCookies()) { //받은 많은 쿠기 중 필요한 쿠키 찾기 
-	        if(("sk_"+locale).equalsIgnoreCase(cookie.getName())) {
-	        	sessionKey = cookie.getValue();
-	        } 
-	    }
+		
+		HashMap <String, String> cookieHashMap = CookieManager.getAllCookies(req);
+		
+		String sessionKey = null;
+		sessionKey = cookieHashMap.get("sk_"+locale); // 많은 쿠키 중 필요한 쿠키 찾기
 		
 		if(sessionKey == null) { //쿠키가 존재하지 않을 때
 			throw new AuthException();			
 		}
+		
+		System.out.println("세션키:" + sessionKey);
 		
 		int userSeq = loginService.getUserSeqByLocale(locale);
 		
@@ -143,4 +147,37 @@ public class LoginController {
 		Message message = new Message();
 		return message;
 	}
+	
+	@PutMapping("/change_password")
+	@ApiOperation(value="비밀번호 바꾸기", notes="비밀번호를 바꿀 수 있는 기능")
+	@ApiResponses(value= {
+		@ApiResponse(code=200, message="비밀번호 변경 완료",  response=Message.class),
+		@ApiResponse(code=404, message="입력된 패스워드와 일치하는 정보가 없음")
+	})
+	@ApiImplicitParams(value= {
+			@ApiImplicitParam(name="locale", value="언어설정: ko 또는 en", example="ko"), 
+			@ApiImplicitParam(name="curPasswd", value="현재 비밀번호", example="1111"), 
+			@ApiImplicitParam(name="newPasswd", value="새로운 비밀번호", example="2222"), 
+	})
+	public Object change_password(
+			@RequestHeader(value="locale") String locale, 
+			@RequestParam("curPasswd") String curPasswd,
+			@RequestParam("newPasswd") String newPasswd) {
+		HashMap<String, String> loginInfo = new HashMap<String, String>();
+		loginInfo.put("passwd", curPasswd);
+		loginInfo.put("locale", locale);
+		String userSeq = loginService.getLoginResult(loginInfo);
+		
+		if( userSeq != null ) { // 로그인 pw가 맞다면
+			loginInfo.put("passwd", newPasswd);
+			loginService.changePasswd(loginInfo);
+		}
+		else {
+			throw new LoginFailException();
+		}
+		
+		Message message = new Message();
+		return message;
+	}
+	
 }

@@ -14,6 +14,9 @@
 	<select id="getUserSeqByLocale" parameterType="String" resultType="int">
 		SELECT seq FROM action_user WHERE locale=#{locale}
 	</select>
+	<update id="changePasswd" parameterType="hashmap">
+		UPDATE action_user SET passwd = #{passwd} WHERE locale = #{locale}
+	</update>
 	
 	<select id="getDfiFoodListByKeyword" parameterType="string" resultType="hashmap">
 		SELECT seq AS 'n', name AS 'name'  FROM dfi_dic_food WHERE name LIKE CONCAT(#{keyword},'%')
@@ -69,4 +72,23 @@
 	<select id="getDrugNumByAtc" parameterType="string" resultType="int">
 		SELECT drug_n FROM ddi_atc WHERE atc=#{atc} 
 	</select>
+	
+	<select id="getCurrencyList" resultType="com.monorama.ddi.model.Currency">
+		SELECT * FROM TCURRENCY
+	</select>
+	<select id="getCurrencyByNum" parameterType="int" resultType="com.monorama.ddi.model.Currency">
+		SELECT * FROM TCURRENCY WHERE num = #{num}
+	</select>
+	<update id="currencyUpdate" parameterType="com.monorama.ddi.model.Currency">
+		UPDATE TCURRENCY
+		SET memo = #{memo}
+		WHERE num = #{num}
+	</update>
+	<delete id="currencyDelete" parameterType="int">
+	 	DELETE FROM TCURRENCY
+        WHERE num = #{num}
+	</delete>
+	<insert id="currencyInsert" parameterType="com.monorama.ddi.model.Currency">
+		INSERT INTO TCURRENCY (code, num, memo) VALUES (#{code}, #{num}, #{memo})
+	</insert>
 </mapper>

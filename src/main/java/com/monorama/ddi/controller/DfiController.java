@@ -83,11 +83,9 @@ public class DfiController {
 		HashMap <String, Integer> info = new HashMap<>();
 		info.put("food_seq", food_seq);
 		info.put("drug_seq", drug_seq);
-		HashMap <String, Object> dfiAndPaper = dfiService.getDfiAndPaperByFoodSeqAndDrugSeq(info);
-		List <Object> list = new ArrayList<>();
-		list.add(dfiAndPaper);
+		List<HashMap <String, Object>> dfiAndPaper = dfiService.getDfiAndPaperByFoodSeqAndDrugSeq(info);
 		Message message = new Message();
-		message.setData(list);
+		message.setData(dfiAndPaper);
 		return message;
 	}
 }

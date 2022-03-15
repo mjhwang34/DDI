@@ -8,10 +8,13 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.monorama.ddi.PkMessage;
+import com.monorama.ddi.Utils;
 import com.monorama.ddi.model.DdiPoly;
 import com.monorama.ddi.model.DdiSnp2;
 import com.monorama.ddi.model.Message;
@@ -57,44 +60,43 @@ public class DdiController {
 			@ApiResponse(code=200, message="약동학적 지표 검색 성공", response=PkResponse.class)
 	})
 	@ApiImplicitParams(value= {@ApiImplicitParam(name="pdrug", value="공격을 하는 약물", example="303"), @ApiImplicitParam(name="vdrug", value="영향을 받는 약물", example="1017")})
-	public Object pk(@RequestParam("pdrug") int pdrugNum, @RequestParam("vdrug") int vdrugNum) {
+	public Object pk(@RequestParam("pdrug") int pdrugNum, @RequestParam("vdrug") int vdrugNum, @RequestHeader(value="locale") String locale) {
 		Message message = new Message();
-		List <Object> resultList = new ArrayList<>();
 		HashMap <String, Integer> info = new HashMap<>();
 		info.put("pdrugNum", pdrugNum);
 		info.put("vdrugNum", vdrugNum);
-		PkResponse pkResponse = ddiService.getPkResponseByPdrugNumAndVdrugNum(info);
+		List<PkResponse> pkResponse = ddiService.getPkResponseByPdrugNumAndVdrugNum(info);
 		if(pkResponse==null) {
-			resultList.add(pkResponse);
+			message.setData(pkResponse);
 			return message;
 		}
-		pkResponse.setPrepetrator_name(ddiService.getDrugNameByDrugNum(pdrugNum));
-		pkResponse.setVictim_name(ddiService.getDrugNameByDrugNum(vdrugNum));
-		if(pkResponse.getReference()==1) {
-			pkResponse.setRef("인공지능 예측결과 입니다.");
+		String prepetratorName = ddiService.getDrugNameByDrugNum(pdrugNum);
+		String victimName = ddiService.getDrugNameByDrugNum(vdrugNum);
+	
+		
+		for(int i=0; i<pkResponse.size(); i++) {
+			PkResponse item = new PkResponse();
+			item.setPrepetrator_name(prepetratorName);
+			item.setVictim_name(victimName);
+			
+			float foldValue = pkResponse.get(i).getFold()-1;
+			foldValue = (float) (Math.round(foldValue*100)/100.0);
+			item.setValue(Float.toString(foldValue));
+			String value = Float.toString(foldValue);
+			item.setValue_p(Math.abs((int)(foldValue*100)));
+			String value_p = Integer.toString(Math.abs((int)(foldValue*100)));
+			String fold = Float.toString(foldValue+1);
+			
+			PkMessage pkMessage = new PkMessage(locale, prepetratorName, victimName, value_p, fold);
+			int reference = pkResponse.get(i).getReference();
+			item.setRef(Utils.findReferenceMessage(reference, pkMessage));
+			item.setDetail(Utils.findDetailMessage(foldValue, pkMessage));
+			pkResponse.set(i, item);
 		}
-		else if(pkResponse.getReference()==0) {
-			pkResponse.setRef("FDA 약품설명서에서 추출한 결과입니다.");
-		}
-		float foldValue = pkResponse.getFold()-1;
-		foldValue = (float) (Math.round(foldValue*100)/100.0);
-		pkResponse.setValue(Float.toString(foldValue));
-		pkResponse.setValue_p(Math.abs((int)(foldValue*100)));
-		String m;
-		if(foldValue>0) {
-			m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC를 " + pkResponse.getValue_p()+"%만큼 증가시킴";  
-		}
-		else if(foldValue<0) {
-			m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC를 " + pkResponse.getValue_p()+"%만큼 감소시킴";
-		}
-		else {
-			m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC에 영향을 주지 않음.";
-		}
-		pkResponse.setDetail(m);
-		resultList.add(pkResponse);
-		message.setData(resultList);
+		message.setData(pkResponse);
 		return message;
 	}
+	
 	
 	@GetMapping("/protein")
 	@ApiOperation(value="DDI의 상호작용 관여 단백질 정보 검색", notes="DDI의 상호작용 관여 단백질 정보를 반환한다.")
@@ -163,7 +165,7 @@ public class DdiController {
 			@ApiResponse(code=200, message="추천 약물 쌍 검색 성공", response=PkResponse.class)
 	})
 	@ApiImplicitParams(value= {@ApiImplicitParam(name="pdrug", value="공격을 하는 약물", example="582"), @ApiImplicitParam(name="vdrug", value="영향을 받는 약물", example="864")})
-	public Object substitution(@RequestParam("pdrug") int pdrugNum, @RequestParam("vdrug") int vdrugNum) {
+	public Object substitution(@RequestParam("pdrug") int pdrugNum, @RequestParam("vdrug") int vdrugNum, @RequestHeader(value="locale") String locale) {
 		List <Object> resultList = new ArrayList<>();
 		List<String> pdrugAtc = ddiService.getDrugAtcByDrugNum(pdrugNum);
 		List<String> vdrugAtc = ddiService.getDrugAtcByDrugNum(vdrugNum);
@@ -183,40 +185,38 @@ public class DdiController {
 		}
 		Set<Integer> vdrugSet = new HashSet<Integer>(vdrugNumListByAtc); // 중복제거
 		List<Integer> vdrugList =new ArrayList<Integer>(vdrugSet);
-		
+	
 		for(int pdrugN: pdrugList) {
 			for(int vdrugN: vdrugList) {
 				HashMap <String, Integer> info = new HashMap<>();
 				info.put("pdrugNum", pdrugN);
 				info.put("vdrugNum", vdrugN);
-				PkResponse pkResponse = ddiService.getPkResponseByPdrugNumAndVdrugNum(info);
+				List<PkResponse> pkResponse = ddiService.getPkResponseByPdrugNumAndVdrugNum(info);
 				if(pkResponse==null) {
 					continue;
 				}
-				pkResponse.setPrepetrator_name(ddiService.getDrugNameByDrugNum(pdrugN));
-				pkResponse.setVictim_name(ddiService.getDrugNameByDrugNum(vdrugN));
-				if(pkResponse.getReference()==1) {
-					pkResponse.setRef("인공지능 예측결과 입니다.");
+				String prepetratorName = ddiService.getDrugNameByDrugNum(pdrugN);
+				String victimName = ddiService.getDrugNameByDrugNum(vdrugN);
+				
+				for(int i=0; i<pkResponse.size(); i++) {
+					PkResponse item = new PkResponse();
+					item.setPrepetrator_name(prepetratorName);
+					item.setVictim_name(victimName);
+					
+					float foldValue = pkResponse.get(i).getFold()-1;
+					foldValue = (float) (Math.round(foldValue*100)/100.0);
+					item.setValue(Float.toString(foldValue));
+					String value = Float.toString(foldValue);
+					item.setValue_p(Math.abs((int)(foldValue*100)));
+					String value_p = Integer.toString(Math.abs((int)(foldValue*100)));
+					String fold = Float.toString(foldValue+1);
+					
+					PkMessage pkMessage = new PkMessage(locale, prepetratorName, victimName, value_p, fold);
+					int reference = pkResponse.get(i).getReference();
+					item.setRef(Utils.findReferenceMessage(reference, pkMessage));
+					item.setDetail(Utils.findDetailMessage(foldValue, pkMessage));
+					resultList.add(item);
 				}
-				else if(pkResponse.getReference()==0) {
-					pkResponse.setRef("FDA 약품설명서에서 추출한 결과입니다.");
-				}
-				float foldValue = pkResponse.getFold()-1;
-				foldValue = (float) (Math.round(foldValue*100)/100.0);
-				pkResponse.setValue(Float.toString(foldValue));
-				pkResponse.setValue_p(Math.abs((int)(foldValue*100)));
-				String m;
-				if(foldValue>0) {
-					m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC를 " + pkResponse.getValue_p()+"%만큼 증가시킴";  
-				}
-				else if(foldValue<0) {
-					m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC를 " + pkResponse.getValue_p()+"%만큼 감소시킴";
-				}
-				else {
-					m = pkResponse.getPrepetrator_name()+"은 "+pkResponse.getVictim_name()+"의 AUC에 영향을 주지 않음.";
-				}
-				pkResponse.setDetail(m);
-				resultList.add(pkResponse);
 			}
 		}
 		
@@ -224,6 +224,5 @@ public class DdiController {
 		message.setData(resultList);
 		return message;
 	}
-	
 
 }

@@ -29,7 +29,7 @@ public class DfiService {
 	public List<HashMap <String, Object>> getDfiDrugListByFoodSeq(int food_seq){
 		return mainMapper.getDfiDrugListByFoodSeq(food_seq);
 	}
-	public HashMap<String, Object> getDfiAndPaperByFoodSeqAndDrugSeq(HashMap <String, Integer> info) {
+	public List<HashMap<String, Object>> getDfiAndPaperByFoodSeqAndDrugSeq(HashMap <String, Integer> info) {
 		return mainMapper.getDfiAndPaperByFoodSeqAndDrugSeq(info);
 	}
 }

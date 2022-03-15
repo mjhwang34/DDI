@@ -52,7 +52,11 @@ message.ko = {
 	
 	ok:'확인',
 	cancel:'취소',
-	download_excel:'엑셀 다운로드'
+	download_excel:'엑셀 다운로드',
+	
+	current_password:'현재 비밀번호',
+	new_password:'새로운 비밀번호',
+	password_changed:'비밀번호가 바뀌었습니다.'
 };
 
 message.en = {
@@ -107,7 +111,11 @@ message.en = {
 	ref_ai:'DDIP-NN prediction',
 	ok:'OK',
 	cancel:'CANCEL',
-	download_excel:'Download'
+	download_excel:'Download',
+	
+	current_password:'Current Password',
+	new_password:'New Password',
+	password_changed:'Password has changed.'
 };
 
 message.es = {
@@ -162,5 +170,9 @@ message.es = {
 	ref_ai:'DDIP-NN predicción',
 	ok:'OK',
 	cancel:'CANCELAR',
-	download_excel:'Descargar'
+	download_excel:'Descargar',
+	
+	current_password:'Contraseña actual',
+	new_password:'Nueva contraseña',
+	password_changed:'La contraseña ha cambiado.'
 };

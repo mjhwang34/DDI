@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'war'
 }
 
 group = 'com.monorama'
@@ -28,13 +29,23 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	//jsp 사용하기 위한 설정
 	implementation('javax.servlet:jstl')
-	implementation("org.apache.tomcat.embed:tomcat-embed-jasper")
+	providedCompile("org.apache.tomcat.embed:tomcat-embed-jasper")
 	//swagger
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	//implementation "io.springfox:springfox-boot-starter:3.0.0"
+	
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+war{
+	enabled=true;
+}
+bootWar { 
+	archiveBaseName = "ddi" 
+	archiveFileName = "ddi.war" 
+	archiveVersion = "0.0.0" 
 }
