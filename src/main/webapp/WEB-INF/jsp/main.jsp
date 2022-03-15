@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="/css/ddi.css">
     <link rel="stylesheet" href="/css/ddi_ko.css">
     <link rel="stylesheet" href="/css/loading.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.10/md-data-table.min.css">
 </head>
 
 <body>
@@ -379,6 +381,156 @@
                             </div>
                         </md-content>
                     </md-tab>
+                    <md-tab label="비밀번호 변경(CHANGE PASSWORD)">
+                        <md-content class="md-padding">
+                            <div layout="row" style="background-color: white;width: fit-content; margin: auto;" ng-style="{'width':is_first_dfi?'fit-content':'auto'}" class="md-padding">
+                                <form name="changePasswordForm" style="max-width: 400px;margin: auto;">
+                        			<md-input-container class="md-block">
+                            			<label>{{ 'current_password' | translate }}</label>
+                            			<input type="text" required md-no-asterisk name="curPasswd" ng-model="user.curPasswd">
+                            			<div ng-messages="chagnePasswordForm.curPasswd.$error">
+                                		<div ng-message="required">{{ 'input_password' | translate }}</div>
+                            			</div>
+                        			</md-input-container>
+                        			<md-input-container class="md-block">
+                            			<label>{{ 'new_password' | translate }}</label>
+                            			<input type="text" required md-no-asterisk name="newPasswd" ng-model="user.newPasswd">
+                            			<div ng-messages="changePasswordForm.newPasswd.$error">
+                                		<div ng-message="required">{{ 'input_password' | translate }}</div>
+                            			</div>
+                        			</md-input-container>
+                        			<md-button class="md-raised md-primary" style="margin:0px;width:100%"
+                            		ng-disabled="changePasswordForm.$invalid" ng-click="changePassword($event)">{{ 'ok' | translate }}</md-button>
+                        			<span class='login_message'>{{login_message}}</span>
+                    			</form>
+                            </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="통화(Currency)">
+                        <md-content class="md-padding">
+                            <div layout="row" layout-align="center">
+   								<div flex="50">
+       								<md-card>
+           								<md-table-container>
+               								<table md-table class="currency_list" md-progress="loading">
+							                	<thead md-head md-order="query.order">
+							                    	<tr md-row>
+							                        	<th md-column md-order-by="code">Code</th>
+							                          	<th md-column md-order-by="num">Num</th>
+							                          	<th md-column md-order-by="memo">Memo</th>
+							                      	</tr>
+							                  	</thead>
+							                  	<tbody md-body>
+							                    	<tr md-row ng-repeat="data in currencyList | limitTo: query.limit : (query.currentPage -1) * query.limit | orderBy:query.order" md-row-select="false"
+							                    	ng-click="selectCurrency(data, $index)">
+							                        	<td md-cell class="code">
+							                              {{data.code}}
+							                          	</td>
+							                          	<td md-cell class="num">
+							                              {{data.num}}
+							                          	</td>
+							                          	<td md-cell class="memo">
+							                              {{data.memo}}
+							                          	</td>
+							                      	</tr>
+							                  	</tbody>
+							              	</table>
+							          	</md-table-container>
+							          	<md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.currentPage"
+							              md-total="{{currencyListCount}}" md-on-paginate="currencyList" md-page-select="options.pageSelect">
+							          	</md-table-pagination>
+							          	<md-button class="md-raised md-primary" ng-click="insert()">추가</md-button>
+							    	</md-card>
+							 	</div>
+							 	<div flex="50">
+									<md-card ng-if="detailMode">
+									    <md-card>
+									        <md-content layout="column" layout-padding >
+									            <div layout="row" layout-align="center">
+									              <md-input-container class="md-block" flex="100">
+									                <label>Code</label>
+									                <input ng-model="selectedCurrencyInfo.code" ng-readonly="modeCurrency!='add'">
+									              </md-input-container>
+									            </div>
+									        	<div layout="row" layout-align="center">
+									              <md-input-container class="md-block" flex="100">
+									                <label>Num</label>
+									                <input ng-model="selectedCurrencyInfo.num" ng-readonly="modeCurrency!='add'">
+									              </md-input-container>
+									            </div>
+												<div layout="row" layout-align="center">
+									              <md-input-container class="md-block" flex="100">
+									                <label>Memo</label>
+									                <input ng-model="selectedCurrencyInfo.memo" ng-readonly="modeCurrency=='select'">
+									              </md-input-container>
+									            </div>
+									         </md-content>
+									    </md-card>
+									    <div ng-if="modeCurrency=='add'" layout="row">
+									    	<div layout="row" flex="50">
+									    		<md-button class="md-warn md-raised" ng-click="save()" flex="100">저장</md-button>
+									    	</div>
+									    	<div layout="row" flex="50">
+									    		<md-button class="md-primary" ng-click="close()" flex="100">닫기</md-button>
+									    	</div>
+									    </div>
+									    <div ng-if="modeCurrency=='select'" layout="row">
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-primary md-raised" ng-click="modify()" flex="100">수정</md-button>
+									    	</div>
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-warn md-raised" ng-click="delete()" flex="100">삭제</md-button>
+									    	</div>
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-primary" ng-click="close()" flex="100">닫기</md-button>
+									    	</div>
+									    </div>
+									    <div ng-if="modeCurrency=='edit'">
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-warn md-raised" ng-click="save()" flex="100">저장</md-button>
+									    	</div>
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-primary md-raised" ng-click="reset()" flex="100">초기화</md-button>
+									    	</div>
+									    	<div layout="row" flex="33">
+									    		<md-button class="md-primary" ng-click="close()" flex="100">닫기</md-button>
+									    	</div>
+									    </div>
+									</md-card>
+							  	</div>
+							  	<!--
+							 	<div flex="50">
+									<md-card ng-if="detailMode">
+									    <md-card>
+									        <md-content layout="column" layout-padding>
+									            <div>
+									              <md-input-container class="md-block">
+									                <label>Code</label>
+									                <input ng-model="selectedCurrencyInfo.code" ng-readonly="modeAdd">
+									              </md-input-container>
+									        
+									              <md-input-container class="md-block">
+									                <label>Num</label>
+									                <input ng-model="selectedCurrencyInfo.num" ng-readonly="modeAdd">
+									              </md-input-container>
+									
+									              <md-input-container class="md-block">
+									                <label>Memo</label>
+									                <input ng-model="selectedCurrencyInfo.memo" ng-readonly="modeCurrency">
+									              </md-input-container>
+									            </div>
+									         </md-content>
+									    </md-card>
+									    <md-button ng-if="!modeCurrency" class="md-warn md-raised" ng-click="save()">저장</md-button>
+									    <md-button ng-if="modeCurrency" class="md-primary md-raised" ng-click="modify()">수정</md-button>
+									    <md-button ng-if="(!modeCurrency)&&modeAdd" class="md-primary md-raised" ng-click="reset()">초기화</md-button>
+									    <md-button ng-if="modeCurrency" class="md-warn md-raised" ng-click="delete()">삭제</md-button>
+									    <md-button class="md-primary" ng-click="close()">닫기</md-button>
+									</md-card>
+							  	</div>-->
+							</div>
+                        </md-content>
+                    </md-tab>
                 </md-tabs>
             </md-card>
             <md-card ng-if="mode=='network'" class="network">
@@ -417,8 +569,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.26/angular-ui-router.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.2/angular-translate.min.js"></script>
 
-
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.10/md-data-table.min.js"></script>
+
 <script>
     var locale = "${language}";
 </script>

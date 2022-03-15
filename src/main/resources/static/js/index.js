@@ -26,7 +26,7 @@ function ng_alert(opt, callback) {
     'use strict';
     angular
         .module('app')
-        .controller('pageCtrl', ['$sce', '$scope', '$timeout', '$q', 'API', '$mdDialog', function ($sce, $scope, $timeout, $q, API, $mdDialog) {
+        .controller('pageCtrl', ['$sce', '$scope', '$timeout', '$q', 'API', '$mdDialog', function ($sce, $scope, $timeout, $q, API, $mdDialog ) {
             var self = this;
 
             $scope.locale = locale;
@@ -677,5 +677,109 @@ function ng_alert(opt, callback) {
             })
 
             $scope.legends = legends;
+
+			// Change Password ===================================================================
+			
+			$scope.changePassword = function (ev) {
+				API.user.change_password({}, $.param({curPasswd: $scope.user.curPasswd, newPasswd: $scope.user.newPasswd})).$promise.then(function(response){
+                    $scope.mode = 'ddi';
+                    $scope.user.curPasswd = '';
+					$scope.user.newPasswd = '';
+					ng_alert(msg.password_changed);
+                }).catch(err => {
+                    ng_alert(msg.no_match_password)
+                })
+            }
+			
+			// Currency =====================================================================
+
+            $scope.limitOptions = [10, 30, 60];
+
+            $scope.query = {
+                order: 'code',
+                limit: 10,
+                currentPage: 1
+            };
+
+            $scope.options = {
+                limitSelect: true,
+                pageSelect: true
+            }
+
+			$scope.detailMode=false;
+			$scope.modeCurrency=null;
+
+            $scope.list = function() {
+                $scope.loading =  API.currency.list({}).$promise;
+
+                $scope.loading.then(response=>{
+                    $scope.currencyList = response.data;
+                    $scope.currencyListCount = response.data.length;
+                })
+			}
+
+			$scope.selectCurrency = function (currency, indx) {
+                $scope.selectedCurrencyInfo = JSON.parse(JSON.stringify(currency));
+                $scope.selected_currency_index = indx;
+				$scope.detailMode=true;
+				$scope.modeCurrency="select";
+				console.log($scope.detailMode);
+            }
+
+            $scope.insert = function(){
+				$scope.selectedCurrencyInfo={
+                    code:"",
+                    num:null,
+                    memo:""
+                }
+				$scope.detailMode=true;
+				$scope.modeCurrency="add";
+            }
+
+            $scope.list();
+
+			$scope.close = function () {
+				$scope.detailMode=false;
+            }
+
+            $scope.modify = function () {
+				$scope.modeCurrency="edit";
+            }
+
+            $scope.save = function () {
+				if($scope.modeCurrency=="add"){
+					API.currency.add({},$scope.selectedCurrencyInfo).$promise.then(response=>{
+                        $scope.list();
+                        $scope.close();
+                    }).catch(err=>{
+                        console.error(err);
+                    })
+				}
+				else if($scope.modeCurrency=="edit"){
+					API.currency.update({num:$scope.selectedCurrencyInfo.num}, {memo:$scope.selectedCurrencyInfo.memo}).$promise.then(response=>{
+                        $scope.list();
+                    }).catch(err=>{
+                        console.error(err);
+                    })
+				}
+            }
+
+            $scope.delete = function(){
+                if(confirm("정말 삭제하시겠습니까?")){
+                    API.currency.delete({num:$scope.selectedCurrencyInfo.num}).$promise.then(response=>{
+                        $scope.list();
+                        $scope.close();
+                    }).catch(err=>{
+                        console.error(err);
+                    })
+                }
+            }
+
+            $scope.reset = function () {
+                API.currency.get({num:$scope.selectedCurrencyInfo.num}).$promise.then(response=>{
+                    $scope.selectedCurrencyInfo = response.data;
+                })
+                $scope.selectedCurrencyInfo = JSON.parse(JSON.stringify($scope.currencyList[$scope.selected_currency_index]));
+            }
         }]);
 })(window);

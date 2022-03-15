@@ -37,4 +37,9 @@ public class GlobalExceptionHandler {
         
         return new ResponseEntity<>(message, headers, StatusEnum.NOT_FOUND.getHttpStatus());
 	}
+	
+	@ExceptionHandler(DuplicatedException.class)
+	public ResponseEntity<Message> DuplicatedException(){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	}
 }

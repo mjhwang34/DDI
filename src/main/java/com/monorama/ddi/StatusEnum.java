@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum StatusEnum {
 	OK("200", "OK", HttpStatus.OK),
     NOT_FOUND("404", "NOT_FOUND", HttpStatus.NOT_FOUND),
-    LOGIN_FAIL("401", "LOGIN_FAIL", HttpStatus.UNAUTHORIZED)
+    LOGIN_FAIL("401", "LOGIN_FAIL", HttpStatus.UNAUTHORIZED),
+    DUPLICATED("001", "DUPLICATED", HttpStatus.BAD_REQUEST)
     ;
 
     String statusCode;

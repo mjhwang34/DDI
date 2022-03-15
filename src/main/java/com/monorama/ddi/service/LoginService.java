@@ -30,4 +30,8 @@ public class LoginService {
 	public int getUserSeqByLocale(String locale) {
 		return mainMapper.getUserSeqByLocale(locale);
 	}
+	
+	public int changePasswd(HashMap <String, String> loginInfo) {
+		return mainMapper.changePasswd(loginInfo);
+	}
 }

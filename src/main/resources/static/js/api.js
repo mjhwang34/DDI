@@ -2,7 +2,7 @@
 
 	'use strict';
     angular
-        .module('app', ['ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize', 'pascalprecht.translate']);
+        .module('app', ['ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize', 'pascalprecht.translate', 'md.data.table']);
 
 	angular.module('app')
 		.factory('API', ['$resource',
@@ -19,6 +19,11 @@
 					'is_login': {
 						method: 'get',
 						params: { cmd: 'is_login' }
+					},
+					'change_password':{
+						method:'put',
+						params:{cmd: 'change_password'},
+						headers:{"content-type": "application/x-www-form-urlencoded; charset=UTF-8"}
 					}
 				});
 
@@ -63,6 +68,27 @@
 						params: { cmd: 'search' }
 					}
 				});
+				
+				api.currency = $resource('/main/currencies/:num', {  }, {
+                    'list':{
+                        method: 'get'
+                    },
+                    'detail':{
+                        method: 'get'
+                    },
+                    'add':{
+                        method:'post',
+                        headers: { "content-type": "application/json; charset=UTF-8" }
+                    },
+                    'update':{
+                        method:'put',
+                        headers: { "content-type": "application/json; charset=UTF-8" }
+                    },
+                    'delete':{
+                        method:'delete'
+                    }
+                });
+
 				return api;
 			}
 		]);
